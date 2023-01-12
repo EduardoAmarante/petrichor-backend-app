@@ -1,96 +1,79 @@
 import 'dotenv/config'
+import { randomUUID } from 'node:crypto'
 import express, { json } from 'express'
-import axios from 'axios'
 import cors from 'cors'
+import axios from 'axios'
+
+import { User } from './types/user'
 
 const port = process.env.PORT ?? 3333
+const urlAuthorize = process.env.URL_AUTHORIZE ?? ''
+const urlAccessToken = process.env.URL_ACCESS_TOKEN ?? ''
+const urlFrontEnd = process.env.URL_FRONTEND ?? ''
+const clientId = process.env.CLIENT_ID ?? ''
+const clientSecret = process.env.CLIENT_SECRET ?? ''
+const scope = 'user'
+const redirect = 'http://localhost:3333/login/github'
 
 const app = express()
 app.use(cors())
 app.use(json())
 
-const clientId = process.env.CLIENT_ID ?? ''
-const clientSecret = process.env.CLIENT_SECRET ?? ''
-
-type User = {
-  id: number
-  name: string
-  email: string
-  profilePicture: string
-}
-
 app.get('/login/github', (req, res) => {
-  const { code } = req.query
+  const state = randomUUID()
 
-  const authOptions = {
-    url: 'https://github.com/login/oauth/access_token',
-    method: 'POST',
-    headers: {
-      Accept: 'application/json'
-    },
-    data: {
+  res.redirect(`${urlAuthorize}?client_id=${clientId}&redirect=${redirect}&scope=${scope}&state=${state}`)
+})
+
+app.get('/login/github/callback', (req, res) => {
+  const { code, state } = req.query
+
+  if (code !== null && state !== null) {
+    const data = {
       client_id: clientId,
       client_secret: clientSecret,
       code
     }
-  }
 
-  axios(authOptions)
-    .then(response => {
-      const accessToken = response.data.access_token
+    axios.post(urlAccessToken, data, {
+      headers: {
+        Accept: 'application/json'
+      }
+    }).then(response => {
+      res.cookie('__t', response.data.access_token)
 
-      res.cookie('AccessToken', accessToken)
-
-      res.redirect('http://localhost:5173/')
+      res.redirect(urlFrontEnd)
+    }).catch(() => {
+      res.redirect(`${urlFrontEnd}/login`)
     })
-    .catch(() => { console.log('Erro 01') })
+  }
 })
 
-async function getUserData (token: string): Promise<any> {
-  const options = {
-    url: 'https://api.github.com/user',
-    method: 'GET',
-    headers: {
-      Authorization: `token ${token}`
-    }
-  }
-
-  const userData = await axios(options)
-
-  return userData.data
-}
-
-async function getUserEmail (token: string): Promise<string> {
-  const options = {
-    url: 'https://api.github.com/user/emails',
-    method: 'GET',
-    headers: {
-      Authorization: `token ${token}`
-    }
-  }
-
-  const emails = await axios(options)
-
-  const email = emails.data[0].email
-
-  return email
-}
-
-app.get('/user', async (req, res) => {
+app.get('/api/user', async (req, res) => {
   const token = req.headers.token as string
 
-  const userData = await getUserData(token)
-
-  const email = await getUserEmail(token)
-
-  const user: User = {
-    id: userData.id,
-    name: userData.name,
-    email,
-    profilePicture: userData.avatar_url
-  }
-
-  res.json(user)
+  Promise.all([
+    axios.get('https://api.github.com/user', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }),
+    axios.get('https://api.github.com/user/emails', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+  ]).then(([userResponse, emailsResponse]) => {
+    const user: User = {
+      id: userResponse.data.id,
+      name: userResponse.data.name,
+      profilePicture: userResponse.data.avatar_url,
+      email: emailsResponse.data[0].email
+    }
+    res.json(user)
+  }).catch(() => {
+    res.redirect(`${urlFrontEnd}/login`)
+  })
 })
 
 app.listen(port, () => {
