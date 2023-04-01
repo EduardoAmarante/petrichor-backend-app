@@ -1,5 +1,6 @@
 import { AuthenticationError } from '@/domain/errors'
 import { GitHubAuthentication } from '@/domain/usecases'
+import { LoadGithubApi } from '@/data/contracts/apis'
 
 class GithubAuthenticationService {
   constructor (
@@ -10,18 +11,6 @@ class GithubAuthenticationService {
     await this.loadGithubApi.loadUser({ code })
     return new AuthenticationError()
   }
-}
-
-interface LoadGithubApi {
-  loadUser: (input: LoadGithubApi.Input) => Promise<LoadGithubApi.Output>
-}
-
-export namespace LoadGithubApi {
-  export type Input = {
-    code: string
-  }
-
-  export type Output = undefined
 }
 
 class LoadGithubApiSpy implements LoadGithubApi {
