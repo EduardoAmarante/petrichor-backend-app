@@ -1,6 +1,6 @@
-export type User = {
-  id: number
-  name: string
-  email: string
-  profilePicture: string
-}
+// export type User = {
+//   id: number
+//   name: string
+//   email: string
+//   profilePicture: string
+// }
