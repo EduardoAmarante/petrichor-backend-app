@@ -5,16 +5,15 @@ import { CreateUserAccountRepository, LoadUserAccountRepository } from '@/data/c
 
 export class GithubAuthenticationService {
   constructor (
-    private readonly loadGithubApi: LoadGithubApi,
-    private readonly loadUserAccountRepository: LoadUserAccountRepository,
-    private readonly createUserAccountRepository: CreateUserAccountRepository
+    private readonly githubApi: LoadGithubApi,
+    private readonly userAccountRepository: LoadUserAccountRepository & CreateUserAccountRepository
   ) {}
 
   async perform ({ code }: GitHubAuthentication.Input): Promise<AuthenticationError> {
-    const githubData = await this.loadGithubApi.loadUser({ code })
+    const githubData = await this.githubApi.loadUser({ code })
     if (githubData !== undefined) {
-      await this.loadUserAccountRepository.load({ email: githubData.email })
-      await this.createUserAccountRepository.createFromGithub(githubData)
+      await this.userAccountRepository.load({ email: githubData.email })
+      await this.userAccountRepository.createFromGithub(githubData)
     }
     return new AuthenticationError()
   }
