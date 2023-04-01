@@ -1,5 +1,5 @@
 import { User } from '@/domain/models'
-import { AutheticationError } from '@/domain/errors'
+import { AuthenticationError } from '@/domain/errors'
 
 export interface GitHubAuthentication {
   perform: (input: GitHubAuthentication.Input) => Promise<GitHubAuthentication.Output>
@@ -10,7 +10,7 @@ export namespace GitHubAuthentication {
     code: string
   }
 
-  export type Output = AuthData | AutheticationError
+  export type Output = AuthData | AuthenticationError
 }
 
 type AuthData = {
