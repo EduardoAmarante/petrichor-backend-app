@@ -1,14 +1,19 @@
 import { AuthenticationError } from '@/domain/errors'
 import { GithubAuthenticationService } from '@/data/services'
+import { LoadGithubApi } from '@/data/contracts/apis'
 
-import { mock } from 'jest-mock-extended'
-import { LoadGithubApi } from '../contracts/apis'
+import { mock, MockProxy } from 'jest-mock-extended'
 
 describe('GithubAuthenticationService', () => {
-  it('should call LoadGithubApi with correct input', async () => {
-    const loadGithubApi = mock<LoadGithubApi>()
-    const sut = new GithubAuthenticationService(loadGithubApi)
+  let loadGithubApi: MockProxy<LoadGithubApi>
+  let sut: GithubAuthenticationService
 
+  beforeEach(() => {
+    loadGithubApi = mock<LoadGithubApi>()
+    sut = new GithubAuthenticationService(loadGithubApi)
+  })
+
+  it('should call LoadGithubApi with correct input', async () => {
     await sut.perform({ code: 'any_code' })
 
     expect(loadGithubApi.loadUser).toHaveBeenCalledWith({ code: 'any_code' })
@@ -16,9 +21,7 @@ describe('GithubAuthenticationService', () => {
   })
 
   it('should return AuthenticationError when LoadGithubApi returns undefined', async () => {
-    const loadGithubApi = mock<LoadGithubApi>()
     loadGithubApi.loadUser.mockResolvedValueOnce(undefined)
-    const sut = new GithubAuthenticationService(loadGithubApi)
 
     const authResult = await sut.perform({ code: 'any_code' })
 
