@@ -1,17 +1,6 @@
 import { AuthenticationError } from '@/domain/errors'
-import { GitHubAuthentication } from '@/domain/usecases'
 import { LoadGithubApi } from '@/data/contracts/apis'
-
-class GithubAuthenticationService {
-  constructor (
-    private readonly loadGithubApi: LoadGithubApi
-  ) {}
-
-  async perform ({ code }: GitHubAuthentication.Input): Promise<AuthenticationError> {
-    await this.loadGithubApi.loadUser({ code })
-    return new AuthenticationError()
-  }
-}
+import { GithubAuthenticationService } from '@/data/services'
 
 class LoadGithubApiSpy implements LoadGithubApi {
   code?: string
