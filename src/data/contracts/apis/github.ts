@@ -7,5 +7,11 @@ export namespace LoadGithubApi {
     code: string
   }
 
-  export type Output = undefined
+  export type Output = undefined | {
+    name: string
+    userName: string
+    email: string
+    avatar: string
+    repositories: string
+  }
 }

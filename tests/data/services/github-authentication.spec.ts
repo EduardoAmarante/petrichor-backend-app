@@ -1,21 +1,34 @@
 import { AuthenticationError } from '@/domain/errors'
 import { GithubAuthenticationService } from '@/data/services'
 import { LoadGithubApi } from '@/data/contracts/apis'
+import { LoadUserAccountRepository } from '@/data/contracts/repositories'
 
 import { mock, MockProxy } from 'jest-mock-extended'
 
 describe('GithubAuthenticationService', () => {
   let code: string
   let loadGithubApi: MockProxy<LoadGithubApi>
+  let loadUserAccountRepository: MockProxy<LoadUserAccountRepository>
   let sut: GithubAuthenticationService
 
   beforeAll(() => {
     code = 'any_code'
-    loadGithubApi = mock<LoadGithubApi>()
+    loadGithubApi = mock()
+    loadUserAccountRepository = mock()
+    loadGithubApi.loadUser.mockResolvedValue({
+      name: 'any_github_name',
+      userName: 'any_github_user_name',
+      email: 'any_github_email',
+      avatar: 'any_github_avatar',
+      repositories: 'any_github_repositories'
+    })
   })
 
   beforeEach(() => {
-    sut = new GithubAuthenticationService(loadGithubApi)
+    sut = new GithubAuthenticationService(
+      loadGithubApi,
+      loadUserAccountRepository
+    )
   })
 
   it('should call LoadGithubApi with correct input', async () => {
@@ -31,5 +44,12 @@ describe('GithubAuthenticationService', () => {
     const authResult = await sut.perform({ code })
 
     expect(authResult).toEqual(new AuthenticationError())
+  })
+
+  it('should call LoadUserAccountRepository when LoadGithubApi returns data', async () => {
+    await sut.perform({ code })
+
+    expect(loadUserAccountRepository.load).toHaveBeenCalledWith({ email: 'any_github_email' })
+    expect(loadUserAccountRepository.load).toHaveBeenCalledTimes(1)
   })
 })
