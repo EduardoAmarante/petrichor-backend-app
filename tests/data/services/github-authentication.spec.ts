@@ -105,4 +105,36 @@ describe('GithubAuthenticationService', () => {
       accessToken: new AccessToken('any_generated_token')
     })
   })
+
+  it('should rethrows if LoadGithubApi thorws', async () => {
+    githubApi.loadUser.mockRejectedValueOnce(new Error('github_error'))
+
+    const promise = sut.perform({ code })
+
+    await expect(promise).rejects.toThrow(new Error('github_error'))
+  })
+
+  it('should rethrows if LoadUserAccountRepository thorws', async () => {
+    userAccountRepository.load.mockRejectedValueOnce(new Error('load_error'))
+
+    const promise = sut.perform({ code })
+
+    await expect(promise).rejects.toThrow(new Error('load_error'))
+  })
+
+  it('should rethrows if SaveUserAccountRepository thorws', async () => {
+    userAccountRepository.saveWithGithub.mockRejectedValueOnce(new Error('save_error'))
+
+    const promise = sut.perform({ code })
+
+    await expect(promise).rejects.toThrow(new Error('save_error'))
+  })
+
+  it('should rethrows if TokenGenerator thorws', async () => {
+    crypto.generateToken.mockRejectedValueOnce(new Error('token_error'))
+
+    const promise = sut.perform({ code })
+
+    await expect(promise).rejects.toThrow(new Error('token_error'))
+  })
 })
