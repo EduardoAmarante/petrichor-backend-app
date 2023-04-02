@@ -7,15 +7,23 @@ export namespace LoadUserAccountRepository {
     email: string
   }
 
-  export type Output = undefined
+  export type Output = undefined | {
+    id: string
+    name: string
+    userName: string
+    email: string
+    avatar: string
+    repositories: string
+  }
 }
 
-export interface CreateUserAccountRepository {
-  createFromGithub: (input: CreateUserAccountRepository.Input) => Promise<void>
+export interface SaveUserAccountRepository {
+  saveWithGithub: (input: SaveUserAccountRepository.Input) => Promise<void>
 }
 
-export namespace CreateUserAccountRepository {
+export namespace SaveUserAccountRepository {
   export type Input = {
+    id?: string
     name: string
     userName: string
     email: string
