@@ -1,4 +1,4 @@
-import { GitHubAccount } from '@/domain/models'
+import { AccessToken, GitHubAccount } from '@/domain/models'
 import { AuthenticationError } from '@/domain/errors'
 import { GitHubAuthentication } from '@/domain/usecases'
 import { LoadGithubApi } from '@/data/contracts/apis'
@@ -18,7 +18,7 @@ export class GithubAuthenticationService {
       const accountData = await this.userAccountRepository.load({ email: githubData.email })
       const gitHubData = new GitHubAccount(githubData, accountData)
       const user = await this.userAccountRepository.saveWithGithub(gitHubData)
-      await this.crypto.generateToken({ key: user.id })
+      await this.crypto.generateToken({ key: user.id, expirationInMs: AccessToken.expirationInMs })
     }
     return new AuthenticationError()
   }

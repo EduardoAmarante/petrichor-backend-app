@@ -1,5 +1,5 @@
 import { AuthenticationError } from '@/domain/errors'
-import { GitHubAccount } from '@/domain/models'
+import { AccessToken, GitHubAccount } from '@/domain/models'
 import { GithubAuthenticationService } from '@/data/services'
 import { LoadGithubApi } from '@/data/contracts/apis'
 import { TokenGenerator } from '@/data/contracts/crypto'
@@ -82,7 +82,10 @@ describe('GithubAuthenticationService', () => {
   it('should call TokenGenerator with correct input', async () => {
     await sut.perform({ code })
 
-    expect(crypto.generateToken).toHaveBeenCalledWith({ key: 'any_account_id' })
+    expect(crypto.generateToken).toHaveBeenCalledWith({
+      key: 'any_account_id',
+      expirationInMs: AccessToken.expirationInMs
+    })
     expect(crypto.generateToken).toHaveBeenCalledTimes(1)
   })
 })
