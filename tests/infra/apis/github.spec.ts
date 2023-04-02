@@ -1,6 +1,6 @@
 import { LoadGithubApi } from '@/data/contracts/apis'
 
-import { mock } from 'jest-mock-extended'
+import { mock, MockProxy } from 'jest-mock-extended'
 
 class GitHubApi {
   constructor (
@@ -36,17 +36,21 @@ describe('GitHubApi', () => {
   let code: string
   let clientId: string
   let clientSecret: string
+  let httpClient: MockProxy<HttpGetClient>
+  let sut: GitHubApi
 
   beforeAll(() => {
     code = 'any_github_token'
     clientId = 'any_client_id'
     clientSecret = 'any_client_secret'
+    httpClient = mock()
+  })
+
+  beforeEach(() => {
+    sut = new GitHubApi(httpClient, clientId, clientSecret)
   })
 
   it('should get github token', async () => {
-    const httpClient = mock<HttpGetClient>()
-    const sut = new GitHubApi(httpClient, clientId, clientSecret)
-
     await sut.loadUser({ code })
 
     expect(httpClient.get).toHaveBeenLastCalledWith({
