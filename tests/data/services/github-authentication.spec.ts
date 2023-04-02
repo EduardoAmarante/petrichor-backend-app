@@ -37,6 +37,7 @@ describe('GithubAuthenticationService', () => {
       repositories: 'any_repositories'
     })
     crypto = mock()
+    crypto.generateToken.mockResolvedValue('any_generated_token')
   })
 
   beforeEach(() => {
@@ -87,5 +88,21 @@ describe('GithubAuthenticationService', () => {
       expirationInMs: AccessToken.expirationInMs
     })
     expect(crypto.generateToken).toHaveBeenCalledTimes(1)
+  })
+
+  it('should return AuthData on success', async () => {
+    const authData = await sut.perform({ code })
+
+    expect(authData).toEqual({
+      user: {
+        id: 'any_account_id',
+        name: 'any_name',
+        userName: 'any_user_name',
+        email: 'any_email',
+        avatar: 'any_avatar',
+        repositories: 'any_repositories'
+      },
+      accessToken: new AccessToken('any_generated_token')
+    })
   })
 })
