@@ -24,7 +24,7 @@ describe('GithubAuthenticationService', () => {
       userName: 'any_github_user_name',
       email: 'any_github_email',
       avatar: 'any_github_avatar',
-      repositories: 'any_github_repositories'
+      reposGithubUrl: 'any_github_repositories'
     })
     userAccountRepository = mock()
     userAccountRepository.load.mockResolvedValue(undefined)
@@ -34,7 +34,7 @@ describe('GithubAuthenticationService', () => {
       userName: 'any_user_name',
       email: 'any_email',
       avatar: 'any_avatar',
-      repositories: 'any_repositories'
+      reposGithubUrl: 'any_repositories'
     })
     crypto = mock()
     crypto.generateToken.mockResolvedValue('any_generated_token')
@@ -100,7 +100,7 @@ describe('GithubAuthenticationService', () => {
         userName: 'any_user_name',
         email: 'any_email',
         avatar: 'any_avatar',
-        repositories: 'any_repositories'
+        reposGithubUrl: 'any_repositories'
       },
       accessToken: new AccessToken('any_generated_token')
     })

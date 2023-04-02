@@ -76,7 +76,7 @@ describe('GitHubApi', () => {
       userName: 'any_github_user_name',
       email: 'any_github_email',
       avatar: 'any_github_avatar',
-      repositories: 'any_github_repositories'
+      reposGithubUrl: 'any_github_repositories'
     })
   })
 })

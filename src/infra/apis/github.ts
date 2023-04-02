@@ -5,7 +5,7 @@ type UserData = {
   name: string
   userName: string
   avatar: string
-  repositories: string
+  reposGithubUrl: string
 }
 
 type EmailData = {
@@ -66,7 +66,7 @@ export class GitHubApi implements LoadGithubApi {
         name: userData.name,
         userName: userData.login,
         avatar: userData.avatar_url,
-        repositories: userData.repos_url
+        reposGithubUrl: userData.repos_url
       }
     }
   }

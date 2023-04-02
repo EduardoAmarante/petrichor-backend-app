@@ -13,7 +13,7 @@ export namespace LoadUserAccountRepository {
     userName: string
     email: string
     avatar: string
-    repositories: string
+    reposGithubUrl: string
   }
 }
 
@@ -28,7 +28,7 @@ export namespace SaveUserAccountRepository {
     userName: string
     email: string
     avatar: string
-    repositories: string
+    reposGithubUrl: string
   }
 
   export type Output = {
@@ -37,6 +37,6 @@ export namespace SaveUserAccountRepository {
     userName: string
     email: string
     avatar: string
-    repositories: string
+    reposGithubUrl: string
   }
 }

@@ -14,6 +14,6 @@ export namespace LoadGithubApi {
     userName: string
     email: string
     avatar: string
-    repositories: string
+    reposGithubUrl: string
   }
 }

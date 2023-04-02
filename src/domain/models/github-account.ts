@@ -3,7 +3,7 @@ type GitHubData = {
   userName: string
   email: string
   avatar: string
-  repositories: string
+  reposGithubUrl: string
 }
 
 type AccountData = {
@@ -16,7 +16,7 @@ export class GitHubAccount {
   userName: string
   email: string
   avatar: string
-  repositories: string
+  reposGithubUrl: string
 
   constructor (githubData: GitHubData, accountData?: AccountData) {
     this.id = accountData?.id
@@ -24,6 +24,6 @@ export class GitHubAccount {
     this.userName = githubData.userName
     this.email = githubData.email
     this.avatar = githubData.avatar
-    this.repositories = githubData.repositories
+    this.reposGithubUrl = githubData.reposGithubUrl
   }
 }

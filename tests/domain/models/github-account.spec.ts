@@ -6,7 +6,7 @@ describe('GitHubAccount', () => {
     userName: 'any_github_user_name',
     email: 'any_github_email',
     avatar: 'any_github_avatar',
-    repositories: 'any_github_repositories'
+    reposGithubUrl: 'any_github_repositories'
   }
 
   it('should create with github data only', () => {
@@ -17,7 +17,7 @@ describe('GitHubAccount', () => {
       userName: 'any_github_user_name',
       email: 'any_github_email',
       avatar: 'any_github_avatar',
-      repositories: 'any_github_repositories'
+      reposGithubUrl: 'any_github_repositories'
     })
   })
 
@@ -31,7 +31,7 @@ describe('GitHubAccount', () => {
       userName: 'any_github_user_name',
       email: 'any_github_email',
       avatar: 'any_github_avatar',
-      repositories: 'any_github_repositories'
+      reposGithubUrl: 'any_github_repositories'
     })
   })
 })
