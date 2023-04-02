@@ -51,8 +51,8 @@ describe('GitHubApi', () => {
 
     expect(httpClient.get).toHaveBeenCalledWith({
       url: 'https://api.github.com/user',
-      params: {
-        access_token: 'any_access_token'
+      headers: {
+        Authorization: 'Bearer any_access_token'
       }
     })
   })
@@ -62,8 +62,8 @@ describe('GitHubApi', () => {
 
     expect(httpClient.get).toHaveBeenCalledWith({
       url: 'https://api.github.com/user/emails',
-      params: {
-        access_token: 'any_access_token'
+      headers: {
+        Authorization: 'Bearer any_access_token'
       }
     })
   })

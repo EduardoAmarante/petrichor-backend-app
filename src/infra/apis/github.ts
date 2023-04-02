@@ -12,7 +12,7 @@ type EmailData = {
   email: string
 }
 
-export class GitHubApi {
+export class GitHubApi implements LoadGithubApi {
   constructor (
     private readonly httpClient: HttpGetClient,
     private readonly clientId: string,
@@ -57,8 +57,8 @@ export class GitHubApi {
 
     const userData: UserGitHub = await this.httpClient.get({
       url: 'https://api.github.com/user',
-      params: {
-        access_token: accessToken
+      headers: {
+        Authorization: `Bearer ${accessToken}`
       }
     })
     if (userData !== undefined) {
@@ -83,8 +83,8 @@ export class GitHubApi {
 
     const emailData: UserEmailGitHub = await this.httpClient.get({
       url: 'https://api.github.com/user/emails',
-      params: {
-        access_token: accessToken
+      headers: {
+        Authorization: `Bearer ${accessToken}`
       }
     })
     if (emailData !== undefined) {
