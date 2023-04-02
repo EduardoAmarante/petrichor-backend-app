@@ -18,12 +18,21 @@ export namespace LoadUserAccountRepository {
 }
 
 export interface SaveUserAccountRepository {
-  saveWithGithub: (input: SaveUserAccountRepository.Input) => Promise<void>
+  saveWithGithub: (input: SaveUserAccountRepository.Input) => Promise<SaveUserAccountRepository.Output>
 }
 
 export namespace SaveUserAccountRepository {
   export type Input = {
     id?: string
+    name: string
+    userName: string
+    email: string
+    avatar: string
+    repositories: string
+  }
+
+  export type Output = {
+    id: string
     name: string
     userName: string
     email: string

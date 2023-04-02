@@ -2,6 +2,7 @@ import { AuthenticationError } from '@/domain/errors'
 import { GitHubAccount } from '@/domain/models'
 import { GithubAuthenticationService } from '@/data/services'
 import { LoadGithubApi } from '@/data/contracts/apis'
+import { TokenGenerator } from '@/data/contracts/crypto'
 import { SaveUserAccountRepository, LoadUserAccountRepository } from '@/data/contracts/repositories'
 
 import { mock, MockProxy } from 'jest-mock-extended'
@@ -12,6 +13,7 @@ describe('GithubAuthenticationService', () => {
   let code: string
   let githubApi: MockProxy<LoadGithubApi>
   let userAccountRepository: MockProxy<LoadUserAccountRepository & SaveUserAccountRepository>
+  let crypto: MockProxy<TokenGenerator>
   let sut: GithubAuthenticationService
 
   beforeAll(() => {
@@ -26,12 +28,22 @@ describe('GithubAuthenticationService', () => {
     })
     userAccountRepository = mock()
     userAccountRepository.load.mockResolvedValue(undefined)
+    userAccountRepository.saveWithGithub.mockResolvedValue({
+      id: 'any_account_id',
+      name: 'any_name',
+      userName: 'any_user_name',
+      email: 'any_email',
+      avatar: 'any_avatar',
+      repositories: 'any_repositories'
+    })
+    crypto = mock()
   })
 
   beforeEach(() => {
     sut = new GithubAuthenticationService(
       githubApi,
-      userAccountRepository
+      userAccountRepository,
+      crypto
     )
   })
 
@@ -65,5 +77,12 @@ describe('GithubAuthenticationService', () => {
 
     expect(userAccountRepository.saveWithGithub).toHaveBeenCalledWith({ any: 'any' })
     expect(userAccountRepository.saveWithGithub).toHaveBeenCalledTimes(1)
+  })
+
+  it('should call TokenGenerator with correct input', async () => {
+    await sut.perform({ code })
+
+    expect(crypto.generateToken).toHaveBeenCalledWith({ key: 'any_account_id' })
+    expect(crypto.generateToken).toHaveBeenCalledTimes(1)
   })
 })
