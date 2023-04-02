@@ -1,3 +1,4 @@
+import { GitHubAccount } from '@/domain/models'
 import { AuthenticationError } from '@/domain/errors'
 import { GitHubAuthentication } from '@/domain/usecases'
 import { LoadGithubApi } from '@/data/contracts/apis'
@@ -13,14 +14,8 @@ export class GithubAuthenticationService {
     const githubData = await this.githubApi.loadUser({ code })
     if (githubData !== undefined) {
       const accountData = await this.userAccountRepository.load({ email: githubData.email })
-      await this.userAccountRepository.saveWithGithub({
-        id: accountData?.id,
-        name: githubData.name,
-        userName: githubData.userName,
-        email: githubData.email,
-        avatar: githubData.avatar,
-        repositories: githubData.repositories
-      })
+      const gitHubData = new GitHubAccount(githubData, accountData)
+      await this.userAccountRepository.saveWithGithub(gitHubData)
     }
     return new AuthenticationError()
   }
