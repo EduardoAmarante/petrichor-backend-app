@@ -1,4 +1,4 @@
-import { AccessToken, GitHubAccount } from '@/domain/models'
+import { AccessToken } from '@/domain/models'
 import { AuthenticationError } from '@/domain/errors'
 
 export interface GitHubAuthentication {
@@ -14,6 +14,13 @@ export namespace GitHubAuthentication {
 }
 
 type AuthData = {
-  user: GitHubAccount
+  user: {
+    id: string
+    name: string
+    userName: string
+    email: string
+    avatar: string
+    reposGithubUrl: string
+  }
   accessToken: AccessToken
 }

@@ -1,4 +1,5 @@
 import { AuthenticationError } from '@/domain/errors'
+import { AccessToken } from '@/domain/models'
 import { GitHubAuthentication } from '@/domain/usecases'
 
 import { MockProxy, mock } from 'jest-mock-extended'
@@ -16,9 +17,19 @@ class GithubLoginController {
       }
     }
     const result = await this.githubAuth.perform({ code: httpRequest.code })
-    return {
-      statusCode: 401,
-      data: result
+    if (result instanceof AuthenticationError) {
+      return {
+        statusCode: 401,
+        data: result
+      }
+    } else {
+      return {
+        statusCode: 200,
+        data: {
+          user: result.user,
+          accessToken: result.accessToken.value
+        }
+      }
     }
   }
 }
@@ -29,11 +40,23 @@ type HttpResponse = {
 }
 
 describe('GithubLoginController', () => {
+  const user = {
+    id: 'any_id',
+    name: 'any_id',
+    userName: 'any_user_name',
+    email: 'any_email',
+    avatar: 'any_avatar',
+    reposGithubUrl: 'any_github_repos'
+  }
   let githubAuth: MockProxy<GitHubAuthentication>
   let sut: GithubLoginController
 
   beforeAll(() => {
     githubAuth = mock()
+    githubAuth.perform.mockResolvedValue({
+      user,
+      accessToken: new AccessToken('any_value')
+    })
   })
 
   beforeEach(() => {
@@ -82,6 +105,18 @@ describe('GithubLoginController', () => {
     expect(httpResponse).toEqual({
       statusCode: 401,
       data: new AuthenticationError()
+    })
+  })
+
+  it('shoul return 200 if authentication succeeds', async () => {
+    const httpResponse = await sut.handle({ code: 'any_code' })
+
+    expect(httpResponse).toEqual({
+      statusCode: 200,
+      data: {
+        user,
+        accessToken: 'any_value'
+      }
     })
   })
 })
