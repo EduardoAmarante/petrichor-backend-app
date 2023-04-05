@@ -34,4 +34,15 @@ describe('GithubLoginController', () => {
       data: new Error('The field code is required')
     })
   })
+
+  it('shoul return 400 if code is undefined', async () => {
+    const sut = new GithubLoginController()
+
+    const httpResponse = await sut.handle({ code: undefined })
+
+    expect(httpResponse).toEqual({
+      statusCode: 400,
+      data: new Error('The field code is required')
+    })
+  })
 })
