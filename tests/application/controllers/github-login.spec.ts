@@ -13,9 +13,13 @@ type HttpResponse = {
 }
 
 describe('GithubLoginController', () => {
-  it('shoul return 400 if code is empty', async () => {
-    const sut = new GithubLoginController()
+  let sut: GithubLoginController
 
+  beforeEach(() => {
+    sut = new GithubLoginController()
+  })
+
+  it('shoul return 400 if code is empty', async () => {
     const httpResponse = await sut.handle({ code: '' })
 
     expect(httpResponse).toEqual({
@@ -25,8 +29,6 @@ describe('GithubLoginController', () => {
   })
 
   it('shoul return 400 if code is null', async () => {
-    const sut = new GithubLoginController()
-
     const httpResponse = await sut.handle({ code: null })
 
     expect(httpResponse).toEqual({
@@ -36,8 +38,6 @@ describe('GithubLoginController', () => {
   })
 
   it('shoul return 400 if code is undefined', async () => {
-    const sut = new GithubLoginController()
-
     const httpResponse = await sut.handle({ code: undefined })
 
     expect(httpResponse).toEqual({
