@@ -44,4 +44,20 @@ describe('TypeormUserAccountRepository', () => {
       expect(account).toBeUndefined()
     })
   })
+
+  describe('saveWithGithub', () => {
+    it('should create an account if id is undefined', async () => {
+      await sut.saveWithGithub({
+        name: 'any_name',
+        userName: 'any_name',
+        email: 'any_email',
+        avatar: 'any_avatar',
+        reposGithubUrl: 'any_repos_github_url'
+      })
+
+      const user = await userAccountRepository.findOne({ where: { email: 'any_email' } })
+
+      expect(user?.id).toBe(1)
+    })
+  })
 })

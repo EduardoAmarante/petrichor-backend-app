@@ -3,7 +3,7 @@ module.exports = {
     '<rootDir>/src/**/*.ts',
     '!<rootDir>/src/main/**',
     '!<rootDir>/src/**/index.ts',
-    '!<rootDir>/src/**/data-source.ts'
+    '!<rootDir>/src/**/migrations/*'
   ],
   coverageDirectory: 'coverage',
   moduleNameMapper: {

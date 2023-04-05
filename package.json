@@ -14,8 +14,8 @@
     "test:staged": "npm t -- --findRelatedTests",
     "test:coverage": "npm t -- --coverage",
     "prepare": "husky install",
-    "migration:generate": "typeorm-ts-node-commonjs -d ./src/infra/typeorm/data-source.ts migration:generate ./src/infra/typeorm/migrations-typeorm/default",
-		"migration:run": "typeorm-ts-node-commonjs -d ./src/infra/typeorm/data-source.ts migration:run"
+    "migration:generate": "typeorm-ts-node-commonjs -d ./src/infra/typeorm/index.ts migration:generate ./src/infra/typeorm/migrations/default",
+		"migration:run": "typeorm-ts-node-commonjs -d ./src/infra/typeorm/index.ts migration:run"
   },
   "keywords": [],
   "author": "",

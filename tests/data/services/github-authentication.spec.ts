@@ -3,7 +3,7 @@ import { AccessToken, GitHubAccount } from '@/domain/models'
 import { GithubAuthenticationService } from '@/data/services'
 import { LoadGithubApi } from '@/data/contracts/apis'
 import { TokenGenerator } from '@/data/contracts/crypto'
-import { SaveUserAccountRepository, LoadUserAccountRepository } from '@/data/contracts/repositories'
+import { SaveUserAccountRepository, LoadUserAccountRepository } from '@/data/contracts/repos'
 
 import { mock, MockProxy } from 'jest-mock-extended'
 

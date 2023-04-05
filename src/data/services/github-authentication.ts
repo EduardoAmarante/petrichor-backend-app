@@ -3,7 +3,7 @@ import { AuthenticationError } from '@/domain/errors'
 import { GitHubAuthentication } from '@/domain/usecases'
 import { LoadGithubApi } from '@/data/contracts/apis'
 import { TokenGenerator } from '@/data/contracts/crypto'
-import { LoadUserAccountRepository, SaveUserAccountRepository } from '@/data/contracts/repositories'
+import { LoadUserAccountRepository, SaveUserAccountRepository } from '@/data/contracts/repos'
 
 export class GithubAuthenticationService implements GitHubAuthentication {
   constructor (

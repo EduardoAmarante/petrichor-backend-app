@@ -1,4 +1,4 @@
-import { LoadUserAccountRepository } from '@/data/contracts/repositories'
+import { LoadUserAccountRepository, SaveUserAccountRepository } from '@/data/contracts/repos'
 import { User } from '@/infra/typeorm/entities-typeorm'
 
 import { Repository } from 'typeorm'
@@ -20,5 +20,15 @@ export class TypeormUserAccountRepository implements LoadUserAccountRepository {
         reposGithubUrl: account.repos_github_url
       }
     }
+  }
+
+  async saveWithGithub (input: SaveUserAccountRepository.Input): Promise<void> {
+    await this.userAccountRepository.save({
+      name: input.name,
+      user_name: input.userName,
+      email: input.email,
+      avatar: input.avatar,
+      repos_github_url: input.reposGithubUrl
+    })
   }
 }
