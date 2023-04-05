@@ -1,5 +1,5 @@
 import { db } from '@/infra/typeorm'
-import { User } from '@/infra/typeorm/entities-typeorm'
+import { User } from '@/infra/typeorm/entities-db'
 import { TypeormUserAccountRepository } from '@/infra/typeorm/repos'
 
 import { Repository } from 'typeorm'

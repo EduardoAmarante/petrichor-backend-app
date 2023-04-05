@@ -1,4 +1,4 @@
-import { User } from '@/infra/typeorm/entities-typeorm'
+import { User } from '@/infra/typeorm/entities-db'
 import { LoadUserAccountRepository, SaveUserAccountRepository } from '@/data/contracts/repos'
 
 import { Repository } from 'typeorm'

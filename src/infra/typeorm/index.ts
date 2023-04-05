@@ -12,16 +12,16 @@ const dbProd = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_DATABASE,
-  entities: [join(`${__dirname}/**/entities-typeorm/*.{ts,js}`)],
-  migrations: [join(`${__dirname}/**/migrations-typeorm/*.{ts,js}`)]
+  entities: [join(`${__dirname}/**/entities-db/*.{ts,js}`)],
+  migrations: [join(`${__dirname}/**/migrations/*.{ts,js}`)]
 })
 
 const dbTest = new DataSource({
   type: 'sqlite',
   database: ':memory:',
   synchronize: true,
-  entities: [join(`${__dirname}/**/entities-typeorm/*.{ts,js}`)],
-  migrations: [join(`${__dirname}/**/migrations-typeorm/*.{ts,js}`)]
+  entities: [join(`${__dirname}/**/entities-db/*.{ts,js}`)],
+  migrations: [join(`${__dirname}/**/migrations/*.{ts,js}`)]
 })
 
 export const db = process.env.DB === 'prod' ? dbProd : dbTest
