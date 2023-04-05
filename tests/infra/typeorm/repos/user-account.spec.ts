@@ -47,7 +47,7 @@ describe('TypeormUserAccountRepository', () => {
 
   describe('saveWithGithub', () => {
     it('should create an account if id is undefined', async () => {
-      await sut.saveWithGithub({
+      const { id } = await sut.saveWithGithub({
         name: 'any_name',
         userName: 'any_name',
         email: 'any_email',
@@ -58,6 +58,7 @@ describe('TypeormUserAccountRepository', () => {
       const user = await userAccountRepository.findOne({ where: { email: 'any_email' } })
 
       expect(user?.id).toBe(1)
+      expect(id).toBe('1')
     })
 
     it('should update account if id is defined', async () => {
@@ -69,7 +70,7 @@ describe('TypeormUserAccountRepository', () => {
         repos_github_url: 'any_repos_github_url'
       })
 
-      await sut.saveWithGithub({
+      const { id, email } = await sut.saveWithGithub({
         id: '1',
         name: 'new_name',
         userName: 'new_name',
@@ -87,6 +88,8 @@ describe('TypeormUserAccountRepository', () => {
         avatar: 'new_avatar',
         repos_github_url: 'new_repos_github_url'
       })
+      expect(id).toBe('1')
+      expect(email).toBe('new_email')
     })
   })
 })

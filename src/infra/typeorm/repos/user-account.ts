@@ -1,5 +1,5 @@
-import { LoadUserAccountRepository, SaveUserAccountRepository } from '@/data/contracts/repos'
 import { User } from '@/infra/typeorm/entities-typeorm'
+import { LoadUserAccountRepository, SaveUserAccountRepository } from '@/data/contracts/repos'
 
 import { Repository } from 'typeorm'
 
@@ -22,25 +22,34 @@ export class TypeormUserAccountRepository implements LoadUserAccountRepository {
     }
   }
 
-  async saveWithGithub (input: SaveUserAccountRepository.Input): Promise<void> {
-    if (input.id === undefined) {
-      await this.userAccountRepository.save({
-        name: input.name,
-        user_name: input.userName,
-        email: input.email,
-        avatar: input.avatar,
-        repos_github_url: input.reposGithubUrl
+  async saveWithGithub ({ id, name, userName, email, avatar, reposGithubUrl }: SaveUserAccountRepository.Input): Promise<SaveUserAccountRepository.Output> {
+    if (id === undefined) {
+      const newUser = await this.userAccountRepository.save({
+        name,
+        user_name: userName,
+        email,
+        avatar,
+        repos_github_url: reposGithubUrl
       })
+      return {
+        id: newUser.id.toString(),
+        name: newUser.name,
+        userName: newUser.user_name,
+        email: newUser.email,
+        avatar: newUser.avatar,
+        reposGithubUrl: newUser.repos_github_url
+      }
     } else {
       await this.userAccountRepository.update({
-        id: parseInt(input.id)
+        id: parseInt(id)
       }, {
-        name: input.name,
-        user_name: input.userName,
-        email: input.email,
-        avatar: input.avatar,
-        repos_github_url: input.reposGithubUrl
+        name,
+        user_name: userName,
+        email,
+        avatar,
+        repos_github_url: reposGithubUrl
       })
+      return { id, name, userName, email, avatar, reposGithubUrl }
     }
   }
 }
