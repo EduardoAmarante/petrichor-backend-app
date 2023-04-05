@@ -3,7 +3,7 @@ import { LoadUserAccountRepository, SaveUserAccountRepository } from '@/data/con
 
 import { Repository } from 'typeorm'
 
-export class TypeormUserAccountRepository implements LoadUserAccountRepository {
+export class TypeormUserAccountRepository implements LoadUserAccountRepository, SaveUserAccountRepository {
   constructor (
     private readonly userAccountRepository: Repository<User>
   ) {}
