@@ -1,3 +1,4 @@
+import { AuthenticationError } from '@/domain/errors'
 import { GitHubAuthentication } from '@/domain/usecases'
 
 import { MockProxy, mock } from 'jest-mock-extended'
@@ -8,10 +9,16 @@ class GithubLoginController {
   ) {}
 
   async handle (httpRequest: any): Promise<HttpResponse> {
-    await this.githubAuth.perform({ code: httpRequest.code })
+    if (httpRequest.code === '' || httpRequest.code === null || httpRequest.code === undefined) {
+      return {
+        statusCode: 400,
+        data: new Error('The field code is required')
+      }
+    }
+    const result = await this.githubAuth.perform({ code: httpRequest.code })
     return {
-      statusCode: 400,
-      data: new Error('The field code is required')
+      statusCode: 401,
+      data: result
     }
   }
 }
@@ -65,5 +72,16 @@ describe('GithubLoginController', () => {
 
     expect(githubAuth.perform).toHaveBeenCalledWith({ code: 'any_code' })
     expect(githubAuth.perform).toHaveBeenCalledTimes(1)
+  })
+
+  it('shoul return 401 if authentication fails', async () => {
+    githubAuth.perform.mockResolvedValueOnce(new AuthenticationError())
+
+    const httpResponse = await sut.handle({ code: 'any_code' })
+
+    expect(httpResponse).toEqual({
+      statusCode: 401,
+      data: new AuthenticationError()
+    })
   })
 })
