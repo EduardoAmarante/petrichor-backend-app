@@ -5,11 +5,11 @@ import { Repository } from 'typeorm'
 
 class TypeormUserAccountRepository implements LoadUserAccountRepository {
   constructor (
-    private readonly userRepository: Repository<User>
+    private readonly userAccountRepository: Repository<User>
   ) {}
 
   async load ({ email }: LoadUserAccountRepository.Input): Promise<LoadUserAccountRepository.Output> {
-    const account = await this.userRepository.findOne({ where: { email } })
+    const account = await this.userAccountRepository.findOne({ where: { email } })
     if (account !== null) {
       return {
         id: account.id.toString(),
@@ -24,25 +24,27 @@ class TypeormUserAccountRepository implements LoadUserAccountRepository {
 }
 
 describe('TypeormUserAccountRepository', () => {
+  let email: string
   let sut: TypeormUserAccountRepository
-  let userRepository: Repository<User>
+  let userAccountRepository: Repository<User>
 
-  beforeAll(async () => {
+  beforeAll(() => {
+    email = 'any_email'
+    userAccountRepository = db.getRepository(User)
+  })
+
+  beforeEach(async () => {
     await db.initialize()
-    userRepository = db.getRepository(User)
+    sut = new TypeormUserAccountRepository(userAccountRepository)
   })
 
-  beforeEach(() => {
-    sut = new TypeormUserAccountRepository(userRepository)
-  })
-
-  afterAll(async () => {
+  afterEach(async () => {
     await db.destroy()
   })
 
   describe('load', () => {
     it('should return an account if email exists', async () => {
-      await userRepository.save({
+      await userAccountRepository.save({
         name: 'any_name',
         user_name: 'any_user_name',
         email: 'any_email',
@@ -50,9 +52,15 @@ describe('TypeormUserAccountRepository', () => {
         repos_github_url: 'any_github_url'
       })
 
-      const account = await sut.load({ email: 'any_email' })
+      const account = await sut.load({ email })
 
       expect(account).toMatchObject({ id: '1' })
+    })
+
+    it('should return undefined if email does not exists', async () => {
+      const account = await sut.load({ email })
+
+      expect(account).toBeUndefined()
     })
   })
 })
