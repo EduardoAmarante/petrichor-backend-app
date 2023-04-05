@@ -59,5 +59,34 @@ describe('TypeormUserAccountRepository', () => {
 
       expect(user?.id).toBe(1)
     })
+
+    it('should update account if id is defined', async () => {
+      await userAccountRepository.save({
+        name: 'any_name',
+        user_name: 'any_name',
+        email: 'any_email',
+        avatar: 'any_avatar',
+        repos_github_url: 'any_repos_github_url'
+      })
+
+      await sut.saveWithGithub({
+        id: '1',
+        name: 'new_name',
+        userName: 'new_name',
+        email: 'new_email',
+        avatar: 'new_avatar',
+        reposGithubUrl: 'new_repos_github_url'
+      })
+      const user = await userAccountRepository.findOne({ where: { id: 1 } })
+
+      expect(user).toEqual({
+        id: 1,
+        name: 'new_name',
+        user_name: 'new_name',
+        email: 'new_email',
+        avatar: 'new_avatar',
+        repos_github_url: 'new_repos_github_url'
+      })
+    })
   })
 })

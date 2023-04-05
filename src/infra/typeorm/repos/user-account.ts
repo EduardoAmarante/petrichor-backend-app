@@ -23,12 +23,24 @@ export class TypeormUserAccountRepository implements LoadUserAccountRepository {
   }
 
   async saveWithGithub (input: SaveUserAccountRepository.Input): Promise<void> {
-    await this.userAccountRepository.save({
-      name: input.name,
-      user_name: input.userName,
-      email: input.email,
-      avatar: input.avatar,
-      repos_github_url: input.reposGithubUrl
-    })
+    if (input.id === undefined) {
+      await this.userAccountRepository.save({
+        name: input.name,
+        user_name: input.userName,
+        email: input.email,
+        avatar: input.avatar,
+        repos_github_url: input.reposGithubUrl
+      })
+    } else {
+      await this.userAccountRepository.update({
+        id: parseInt(input.id)
+      }, {
+        name: input.name,
+        user_name: input.userName,
+        email: input.email,
+        avatar: input.avatar,
+        repos_github_url: input.reposGithubUrl
+      })
+    }
   }
 }
