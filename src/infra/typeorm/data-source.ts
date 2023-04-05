@@ -19,6 +19,7 @@ const dbProd = new DataSource({
 const dbTest = new DataSource({
   type: 'sqlite',
   database: ':memory:',
+  synchronize: true,
   entities: [join(`${__dirname}/**/entities-typeorm/*.{ts,js}`)],
   migrations: [join(`${__dirname}/**/migrations-typeorm/*.{ts,js}`)]
 })
