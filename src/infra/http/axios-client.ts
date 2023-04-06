@@ -1,10 +1,15 @@
 import { HttpGetClient } from '@/infra/http'
 
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 
 export class AxiosHttpClient {
-  async get ({ url, params }: HttpGetClient.Input): Promise<any> {
-    const result = await axios.get(url, { params })
+  async get ({ url, params, headers }: HttpGetClient.Input): Promise<any> {
+    let result: AxiosResponse
+    if (params !== undefined) {
+      result = await axios.get(url, { params })
+    } else {
+      result = await axios.get(url, { headers })
+    }
     return result.data
   }
 }
