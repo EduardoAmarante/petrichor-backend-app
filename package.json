@@ -10,13 +10,14 @@
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "check": "npm-check -s -u",
+    "prepare": "husky install",
     "migration:generate": "typeorm-ts-node-commonjs -d ./src/infra/typeorm/index.ts migration:generate ./src/infra/typeorm/migrations/default",
     "migration:run": "typeorm-ts-node-commonjs -d ./src/infra/typeorm/index.ts migration:run",
     "test": "jest --passWithNoTests --no-cache --runInBand",
     "test:watch": "npm t -- --watch",
     "test:staged": "npm t -- --findRelatedTests",
     "test:coverage": "npm t -- --coverage",
-    "prepare": "husky install"
+    "test:github-api": "npm test -- -c ./jest.integration.config.js ./tests/external/github-api.test.ts"
   },
   "keywords": [],
   "author": "",
