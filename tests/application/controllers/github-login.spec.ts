@@ -1,60 +1,14 @@
+import { GithubLoginController } from '@/application/controllers'
+import { ServerError } from '@/application/errors'
 import { AuthenticationError } from '@/domain/errors'
 import { AccessToken } from '@/domain/models'
 import { GitHubAuthentication } from '@/domain/usecases'
 
 import { MockProxy, mock } from 'jest-mock-extended'
 
-class GithubLoginController {
-  constructor (
-    private readonly githubAuth: GitHubAuthentication
-  ) {}
-
-  async handle (httpRequest: any): Promise<HttpResponse> {
-    try {
-      if (httpRequest.code === '' || httpRequest.code === null || httpRequest.code === undefined) {
-        return {
-          statusCode: 400,
-          data: new Error('The field code is required')
-        }
-      }
-      const result = await this.githubAuth.perform({ code: httpRequest.code })
-      if (result instanceof AuthenticationError) {
-        return {
-          statusCode: 401,
-          data: result
-        }
-      } else {
-        return {
-          statusCode: 200,
-          data: {
-            user: result.user,
-            accessToken: result.accessToken.value
-          }
-        }
-      }
-    } catch (error) {
-      return {
-        statusCode: 500,
-        data: new ServerError()
-      }
-    }
-  }
-}
-
-type HttpResponse = {
-  statusCode: number
-  data: any
-}
-
-class ServerError extends Error {
-  constructor (error?: Error) {
-    super('Internal Server Error')
-    this.name = 'ServerError'
-    this.stack = error?.stack
-  }
-}
-
 describe('GithubLoginController', () => {
+  let githubAuth: MockProxy<GitHubAuthentication>
+  let sut: GithubLoginController
   const user = {
     id: 'any_id',
     name: 'any_id',
@@ -63,8 +17,6 @@ describe('GithubLoginController', () => {
     avatar: 'any_avatar',
     reposGithubUrl: 'any_github_repos'
   }
-  let githubAuth: MockProxy<GitHubAuthentication>
-  let sut: GithubLoginController
 
   beforeAll(() => {
     githubAuth = mock()
