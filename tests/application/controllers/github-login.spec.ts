@@ -10,25 +10,32 @@ class GithubLoginController {
   ) {}
 
   async handle (httpRequest: any): Promise<HttpResponse> {
-    if (httpRequest.code === '' || httpRequest.code === null || httpRequest.code === undefined) {
-      return {
-        statusCode: 400,
-        data: new Error('The field code is required')
-      }
-    }
-    const result = await this.githubAuth.perform({ code: httpRequest.code })
-    if (result instanceof AuthenticationError) {
-      return {
-        statusCode: 401,
-        data: result
-      }
-    } else {
-      return {
-        statusCode: 200,
-        data: {
-          user: result.user,
-          accessToken: result.accessToken.value
+    try {
+      if (httpRequest.code === '' || httpRequest.code === null || httpRequest.code === undefined) {
+        return {
+          statusCode: 400,
+          data: new Error('The field code is required')
         }
+      }
+      const result = await this.githubAuth.perform({ code: httpRequest.code })
+      if (result instanceof AuthenticationError) {
+        return {
+          statusCode: 401,
+          data: result
+        }
+      } else {
+        return {
+          statusCode: 200,
+          data: {
+            user: result.user,
+            accessToken: result.accessToken.value
+          }
+        }
+      }
+    } catch (error) {
+      return {
+        statusCode: 500,
+        data: new ServerError()
       }
     }
   }
@@ -37,6 +44,14 @@ class GithubLoginController {
 type HttpResponse = {
   statusCode: number
   data: any
+}
+
+class ServerError extends Error {
+  constructor (error?: Error) {
+    super('Internal Server Error')
+    this.name = 'ServerError'
+    this.stack = error?.stack
+  }
 }
 
 describe('GithubLoginController', () => {
@@ -117,6 +132,18 @@ describe('GithubLoginController', () => {
         user,
         accessToken: 'any_value'
       }
+    })
+  })
+
+  it('shoul return 500 if authentication throws', async () => {
+    const error = new Error('server_error')
+    githubAuth.perform.mockRejectedValueOnce(error)
+
+    const httpResponse = await sut.handle({ code: 'any_code' })
+
+    expect(httpResponse).toEqual({
+      statusCode: 500,
+      data: new ServerError(error)
     })
   })
 })
