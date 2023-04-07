@@ -24,7 +24,7 @@ export class GitHubApi implements LoadGithubApi {
     if (accessToken !== undefined) {
       const userData = await this.getUserData(accessToken)
       const email = await this.getEmailData(accessToken)
-      if (userData !== undefined && email !== undefined) {
+      if (email !== undefined) {
         return {
           ...userData,
           ...email
@@ -34,7 +34,7 @@ export class GitHubApi implements LoadGithubApi {
   }
 
   private async getAccessToken (code: string): Promise<string | undefined> {
-    const { access_token } = await this.httpClient.get({
+    const result: string = await this.httpClient.get({
       url: 'https://github.com/login/oauth/access_token',
       params: {
         client_id: this.clientId,
@@ -42,55 +42,38 @@ export class GitHubApi implements LoadGithubApi {
         code
       }
     })
-    if (access_token !== undefined) {
-      return access_token
+    const response = result.toString().split('=')
+    if (response[0] === 'access_token') {
+      return response[1].split('&')[0]
     }
   }
 
-  private async getUserData (accessToken: string): Promise<UserData | undefined> {
-    type UserGitHub = {
-      name: string
-      login: string
-      avatar_url: string
-      repos_url: string
-    }
-
-    const userData: UserGitHub = await this.httpClient.get({
+  private async getUserData (accessToken: string): Promise<UserData> {
+    const { name, login, avatar_url, repos_url } = await this.httpClient.get({
       url: 'https://api.github.com/user',
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
     })
-    if (userData !== undefined) {
-      return {
-        name: userData.name,
-        userName: userData.login,
-        avatar: userData.avatar_url,
-        reposGithubUrl: userData.repos_url
-      }
+    return {
+      name,
+      userName: login,
+      avatar: avatar_url,
+      reposGithubUrl: repos_url
     }
   }
 
   private async getEmailData (accessToken: string): Promise<EmailData | undefined> {
-    type UserEmailGitHub = {
-      email: EmailGitHub[]
-    }
-
-    type EmailGitHub = {
-      email: string
-      primary: boolean
-    }
-
-    const emailData: UserEmailGitHub = await this.httpClient.get({
+    const emailData = await this.httpClient.get({
       url: 'https://api.github.com/user/emails',
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
     })
-    if (emailData !== undefined) {
-      const email = emailData.email.filter(e => e.primary)
+    if (Array.isArray(emailData)) {
+      const emailObj = emailData.filter(e => e.primary)
       return {
-        email: email[0].email
+        email: emailObj[0].email
       }
     }
   }

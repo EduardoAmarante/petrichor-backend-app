@@ -17,19 +17,17 @@ describe('GitHubApi', () => {
   })
 
   beforeEach(() => {
-    httpClient.get.mockResolvedValueOnce({ access_token: 'any_access_token' })
+    httpClient.get.mockResolvedValueOnce('access_token=any_token')
     httpClient.get.mockResolvedValueOnce({
       name: 'any_github_name',
       login: 'any_github_user_name',
       avatar_url: 'any_github_avatar',
       repos_url: 'any_github_repositories'
     })
-    httpClient.get.mockResolvedValueOnce({
-      email: [{
-        email: 'any_github_email',
-        primary: true
-      }]
-    })
+    httpClient.get.mockResolvedValueOnce([{
+      email: 'any_github_email',
+      primary: true
+    }])
     sut = new GitHubApi(httpClient, clientId, clientSecret)
   })
 
@@ -52,7 +50,7 @@ describe('GitHubApi', () => {
     expect(httpClient.get).toHaveBeenCalledWith({
       url: 'https://api.github.com/user',
       headers: {
-        Authorization: 'Bearer any_access_token'
+        Authorization: 'Bearer any_token'
       }
     })
   })
@@ -63,7 +61,7 @@ describe('GitHubApi', () => {
     expect(httpClient.get).toHaveBeenCalledWith({
       url: 'https://api.github.com/user/emails',
       headers: {
-        Authorization: 'Bearer any_access_token'
+        Authorization: 'Bearer any_token'
       }
     })
   })
