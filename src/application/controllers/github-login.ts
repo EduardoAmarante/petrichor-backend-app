@@ -1,6 +1,6 @@
 import { GitHubAuthentication } from '@/domain/usecases'
-import { HttpResponse, badRequest, unauthorized } from '@/application/helpers'
-import { RequiredFieldError, ServerError } from '@/application/errors'
+import { HttpResponse, badRequest, serverError, unauthorized } from '@/application/helpers'
+import { RequiredFieldError } from '@/application/errors'
 import { AuthenticationError } from '@/domain/errors'
 
 export class GithubLoginController {
@@ -26,10 +26,8 @@ export class GithubLoginController {
         }
       }
     } catch (error) {
-      return {
-        statusCode: 500,
-        data: new ServerError()
-      }
+      const err = error as Error
+      return serverError(err)
     }
   }
 }
