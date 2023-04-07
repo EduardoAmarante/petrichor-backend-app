@@ -40,7 +40,7 @@ describe('GithubLoginController', () => {
   })
 
   it('shoul return 400 if code is null', async () => {
-    const httpResponse = await sut.handle({ code: null })
+    const httpResponse = await sut.handle({ code: null as any })
 
     expect(httpResponse).toEqual({
       statusCode: 400,
@@ -49,7 +49,7 @@ describe('GithubLoginController', () => {
   })
 
   it('shoul return 400 if code is undefined', async () => {
-    const httpResponse = await sut.handle({ code: undefined })
+    const httpResponse = await sut.handle({ code: undefined as any })
 
     expect(httpResponse).toEqual({
       statusCode: 400,
