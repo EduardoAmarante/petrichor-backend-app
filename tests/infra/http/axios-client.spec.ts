@@ -27,14 +27,14 @@ describe('AxiosHttpClient', () => {
   })
 
   it('should call get with correct input', async () => {
-    await sut.get({ url, params, headers })
+    await sut.get({ url, headers, params })
 
     expect(fakeAxios.get).toHaveBeenCalledWith(url, { headers, params })
     expect(fakeAxios.get).toHaveBeenCalledTimes(1)
   })
 
   it('should return data on sucess', async () => {
-    const result = await sut.get({ url, params })
+    const result = await sut.get({ url, headers, params })
 
     expect(result).toEqual('any_data')
   })
@@ -42,7 +42,7 @@ describe('AxiosHttpClient', () => {
   it('should rethrow if get throws', async () => {
     fakeAxios.get.mockRejectedValueOnce(new Error('http_error'))
 
-    const promise = sut.get({ url, params })
+    const promise = sut.get({ url, headers, params })
 
     await expect(promise).rejects.toThrow(new Error('http_error'))
   })
