@@ -1,32 +1,29 @@
 import { GithubLoginController } from '@/application/controllers'
-import { ServerError, UnauthorizedError } from '@/application/errors'
-import { RequiredStringValidator, ValidationComposite } from '@/application/validation'
+import { UnauthorizedError } from '@/application/errors'
+import { RequiredStringValidator } from '@/application/validation'
 import { AuthenticationError } from '@/domain/errors'
 import { AccessToken } from '@/domain/models'
 import { GitHubAuthentication } from '@/domain/usecases'
 
 import { MockProxy, mock } from 'jest-mock-extended'
 
-jest.mock('@/application/validation/composite')
-
 describe('GithubLoginController', () => {
   let githubAuth: MockProxy<GitHubAuthentication>
   let sut: GithubLoginController
-  const user = {
-    id: 'any_id',
-    name: 'any_id',
-    userName: 'any_user_name',
-    email: 'any_email',
-    avatar: 'any_avatar',
-    reposGithubUrl: 'any_github_repos'
-  }
   let code: string
 
   beforeAll(() => {
     code = 'any_code'
     githubAuth = mock()
     githubAuth.perform.mockResolvedValue({
-      user,
+      user: {
+        id: 'any_id',
+        name: 'any_id',
+        userName: 'any_user_name',
+        email: 'any_email',
+        avatar: 'any_avatar',
+        reposGithubUrl: 'any_github_repos'
+      },
       accessToken: new AccessToken('any_value')
     })
   })
@@ -35,22 +32,12 @@ describe('GithubLoginController', () => {
     sut = new GithubLoginController(githubAuth)
   })
 
-  it('shoul return 400 if validation fails', async () => {
-    const error = new Error('validation_error')
-    const ValidationCompositeSpy = jest.fn().mockImplementationOnce(() => ({
-      validate: jest.fn().mockReturnValueOnce(error)
-    }))
-    jest.mocked(ValidationComposite).mockImplementationOnce(ValidationCompositeSpy)
+  it('shoul build Validators correctly', async () => {
+    const validators = sut.buildValidators({ code })
 
-    const httpResponse = await sut.handle({ code })
-
-    expect(ValidationComposite).toHaveBeenCalledWith([
+    expect(validators).toEqual([
       new RequiredStringValidator('any_code', 'code')
     ])
-    expect(httpResponse).toEqual({
-      statusCode: 400,
-      data: error
-    })
   })
 
   it('shoul call GithubAuthentication with correct input', async () => {
@@ -77,21 +64,16 @@ describe('GithubLoginController', () => {
     expect(httpResponse).toEqual({
       statusCode: 200,
       data: {
-        user,
+        user: {
+          id: 'any_id',
+          name: 'any_id',
+          userName: 'any_user_name',
+          email: 'any_email',
+          avatar: 'any_avatar',
+          reposGithubUrl: 'any_github_repos'
+        },
         accessToken: 'any_value'
       }
-    })
-  })
-
-  it('shoul return 500 if authentication throws', async () => {
-    const error = new Error('server_error')
-    githubAuth.perform.mockRejectedValueOnce(error)
-
-    const httpResponse = await sut.handle({ code })
-
-    expect(httpResponse).toEqual({
-      statusCode: 500,
-      data: new ServerError(error)
     })
   })
 })

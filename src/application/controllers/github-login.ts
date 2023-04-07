@@ -1,5 +1,6 @@
-import { HttpResponse, badRequest, ok, serverError, unauthorized } from '@/application/helpers'
-import { ValidationBuilder as Builder, ValidationComposite } from '@/application/validation'
+import { Controller } from '@/application/controllers'
+import { HttpResponse, ok, unauthorized } from '@/application/helpers'
+import { ValidationBuilder as Builder, Validator } from '@/application/validation'
 import { GitHubAuthentication } from '@/domain/usecases'
 import { AuthenticationError } from '@/domain/errors'
 
@@ -12,35 +13,26 @@ type Return = Error | {
   accessToken: string
 }
 
-export class GithubLoginController {
-  constructor (
-    private readonly githubAuth: GitHubAuthentication
-  ) {}
+export class GithubLoginController extends Controller {
+  constructor (private readonly githubAuth: GitHubAuthentication) {
+    super()
+  }
 
-  async handle ({ code }: HttpRequest): Promise<HttpResponse<Return>> {
-    const error = this.validate({ code })
-    if (error !== undefined) {
-      return badRequest(error)
-    }
-    try {
-      const result = await this.githubAuth.perform({ code })
-      if (result instanceof AuthenticationError) {
-        return unauthorized()
-      } else {
-        return ok({
-          user: result.user,
-          accessToken: result.accessToken.value
-        })
-      }
-    } catch (error) {
-      const err = error as Error
-      return serverError(err)
+  async perform ({ code }: HttpRequest): Promise<HttpResponse<Return>> {
+    const result = await this.githubAuth.perform({ code })
+    if (result instanceof AuthenticationError) {
+      return unauthorized()
+    } else {
+      return ok({
+        user: result.user,
+        accessToken: result.accessToken.value
+      })
     }
   }
 
-  private validate ({ code }: HttpRequest): Error | undefined {
-    return new ValidationComposite([
+  override buildValidators ({ code }: HttpRequest): Validator[] {
+    return [
       ...Builder.of({ value: code, fieldName: 'code' }).required().build()
-    ]).validate()
+    ]
   }
 }
