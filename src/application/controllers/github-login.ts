@@ -1,5 +1,5 @@
 import { GitHubAuthentication } from '@/domain/usecases'
-import { HttpResponse, badRequest } from '@/application/helpers'
+import { HttpResponse, badRequest, unauthorized } from '@/application/helpers'
 import { RequiredFieldError, ServerError } from '@/application/errors'
 import { AuthenticationError } from '@/domain/errors'
 
@@ -15,10 +15,7 @@ export class GithubLoginController {
       }
       const result = await this.githubAuth.perform({ code: httpRequest.code })
       if (result instanceof AuthenticationError) {
-        return {
-          statusCode: 401,
-          data: result
-        }
+        return unauthorized()
       } else {
         return {
           statusCode: 200,
