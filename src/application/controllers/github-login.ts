@@ -18,7 +18,7 @@ export class GithubLoginController extends Controller {
     super()
   }
 
-  async perform ({ code }: HttpRequest): Promise<HttpResponse<Return>> {
+  async exec ({ code }: HttpRequest): Promise<HttpResponse<Return>> {
     const result = await this.githubAuth.perform({ code })
     if (result instanceof AuthenticationError) {
       return unauthorized()

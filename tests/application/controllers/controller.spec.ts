@@ -11,7 +11,7 @@ class ControllerStub extends Controller {
     data: 'any_data'
   }
 
-  async perform (httpRequest: any): Promise<HttpResponse> {
+  async exec (httpRequest: any): Promise<HttpResponse> {
     return this.result
   }
 }
@@ -39,9 +39,9 @@ describe('Controller', () => {
     })
   })
 
-  it('shoul return 500 if perform throws', async () => {
+  it('shoul return 500 if exec throws', async () => {
     const error = new Error('perform_error')
-    jest.spyOn(sut, 'perform').mockRejectedValueOnce(error)
+    jest.spyOn(sut, 'exec').mockRejectedValueOnce(error)
 
     const httpResponse = await sut.handle('any_value')
 
