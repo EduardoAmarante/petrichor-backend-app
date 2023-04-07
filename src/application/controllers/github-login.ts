@@ -1,5 +1,5 @@
 import { HttpResponse, badRequest, ok, serverError, unauthorized } from '@/application/helpers'
-import { RequiredStringValidator } from '@/application/validation'
+import { RequiredStringValidator, ValidationComposite } from '@/application/validation'
 import { GitHubAuthentication } from '@/domain/usecases'
 import { AuthenticationError } from '@/domain/errors'
 
@@ -39,7 +39,8 @@ export class GithubLoginController {
   }
 
   private validate ({ code }: HttpRequest): Error | undefined {
-    const validator = new RequiredStringValidator(code, 'code')
-    return validator.validate()
+    return new ValidationComposite([
+      new RequiredStringValidator(code, 'code')
+    ]).validate()
   }
 }

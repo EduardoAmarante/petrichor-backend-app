@@ -1,13 +1,13 @@
 import { GithubLoginController } from '@/application/controllers'
 import { ServerError, UnauthorizedError } from '@/application/errors'
-import { RequiredStringValidator } from '@/application/validation'
+import { RequiredStringValidator, ValidationComposite } from '@/application/validation'
 import { AuthenticationError } from '@/domain/errors'
 import { AccessToken } from '@/domain/models'
 import { GitHubAuthentication } from '@/domain/usecases'
 
 import { MockProxy, mock } from 'jest-mock-extended'
 
-jest.mock('@/application/validation/required-string')
+jest.mock('@/application/validation/composite')
 
 describe('GithubLoginController', () => {
   let githubAuth: MockProxy<GitHubAuthentication>
@@ -37,14 +37,16 @@ describe('GithubLoginController', () => {
 
   it('shoul return 400 if validation fails', async () => {
     const error = new Error('validation_error')
-    const RequiredStringValidatorSpy = jest.fn().mockImplementationOnce(() => ({
+    const ValidationCompositeSpy = jest.fn().mockImplementationOnce(() => ({
       validate: jest.fn().mockReturnValueOnce(error)
     }))
-    jest.mocked(RequiredStringValidator).mockImplementationOnce(RequiredStringValidatorSpy)
+    jest.mocked(ValidationComposite).mockImplementationOnce(ValidationCompositeSpy)
 
     const httpResponse = await sut.handle({ code })
 
-    expect(RequiredStringValidator).toHaveBeenCalledWith('any_code', 'code')
+    expect(ValidationComposite).toHaveBeenCalledWith([
+      new RequiredStringValidator('any_code', 'code')
+    ])
     expect(httpResponse).toEqual({
       statusCode: 400,
       data: error
