@@ -1,5 +1,5 @@
 import { GithubLoginController } from '@/application/controllers'
-import { ServerError } from '@/application/errors'
+import { RequiredFieldError, ServerError } from '@/application/errors'
 import { AuthenticationError } from '@/domain/errors'
 import { AccessToken } from '@/domain/models'
 import { GitHubAuthentication } from '@/domain/usecases'
@@ -44,7 +44,7 @@ describe('GithubLoginController', () => {
 
     expect(httpResponse).toEqual({
       statusCode: 400,
-      data: new Error('The field code is required')
+      data: new RequiredFieldError('code')
     })
   })
 
