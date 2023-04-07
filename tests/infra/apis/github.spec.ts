@@ -77,4 +77,12 @@ describe('GitHubApi', () => {
       reposGithubUrl: 'any_github_repositories'
     })
   })
+
+  it('should return undefined if http client throws', async () => {
+    httpClient.get.mockReset().mockRejectedValueOnce(new Error('http_error'))
+
+    const promise = sut.loadUser({ code })
+
+    await expect(promise).rejects.toThrow(new Error('http_error'))
+  })
 })
