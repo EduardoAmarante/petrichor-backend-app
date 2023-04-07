@@ -16,7 +16,7 @@ describe('GitHub Api Integration Tests', () => {
   })
 
   it('should return a GitHub User if code is valid', async () => {
-    const githubUser = await sut.loadUser({ code: '79da3f32c3829791907d' })
+    const githubUser = await sut.loadUser({ code: 'aecf90ccb6ece68fd151' })
 
     expect(githubUser).toEqual({
       name: 'Tiago Oliveira',

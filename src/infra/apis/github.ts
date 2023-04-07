@@ -1,17 +1,6 @@
 import { HttpGetClient } from '@/infra/http'
 import { LoadGithubApi } from '@/data/contracts/apis'
 
-type UserData = {
-  name: string
-  userName: string
-  avatar: string
-  reposGithubUrl: string
-}
-
-type EmailData = {
-  email: string
-}
-
 export class GitHubApi implements LoadGithubApi {
   constructor (
     private readonly httpClient: HttpGetClient,
@@ -22,14 +11,7 @@ export class GitHubApi implements LoadGithubApi {
   async loadUser ({ code }: LoadGithubApi.Input): Promise<LoadGithubApi.Output> {
     const accessToken = await this.getAccessToken(code)
     if (accessToken !== undefined) {
-      const userData = await this.getUserData(accessToken)
-      const email = await this.getEmailData(accessToken)
-      if (userData !== undefined && email !== undefined) {
-        return {
-          ...userData,
-          ...email
-        }
-      }
+      return this.getGitHubUser(accessToken)
     }
   }
 
@@ -49,33 +31,23 @@ export class GitHubApi implements LoadGithubApi {
     }
   }
 
-  private async getUserData (accessToken: string): Promise<UserData | undefined> {
-    return await this.httpClient.get({
-      url: 'https://api.github.com/user',
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    }).then(({ name, login, avatar_url, repos_url }) => ({
-      name,
-      userName: login,
-      avatar: avatar_url,
-      reposGithubUrl: repos_url
-    })).catch(() => undefined)
-  }
-
-  private async getEmailData (accessToken: string): Promise<EmailData | undefined> {
-    return await this.httpClient.get({
-      url: 'https://api.github.com/user/emails',
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    }).then(emailData => {
+  private async getGitHubUser (accessToken: string): Promise<LoadGithubApi.Output> {
+    const baseUrl = 'https://api.github.com/user'
+    const headers = { Authorization: `Bearer ${accessToken}` }
+    return Promise.all([
+      this.httpClient.get({ url: baseUrl, headers }),
+      this.httpClient.get({ url: `${baseUrl}/emails`, headers })
+    ]).then(([{ name, login, avatar_url, repos_url }, emailData]) => {
       if (Array.isArray(emailData)) {
         const emailObj = emailData.filter(e => e.primary)
         return {
-          email: emailObj[0].email
+          name,
+          userName: login,
+          email: emailObj[0].email,
+          avatar: avatar_url,
+          reposGithubUrl: repos_url
         }
       }
-    }).catch(() => undefined)
+    })
   }
 }

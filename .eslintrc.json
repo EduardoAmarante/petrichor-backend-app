@@ -9,6 +9,7 @@
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-misused-promises": "off",
     "@typescript-eslint/naming-convention": "off",
-    "n/no-path-concat": "off"
+    "n/no-path-concat": "off",
+    "@typescript-eslint/return-await": "off"
   }
 }
