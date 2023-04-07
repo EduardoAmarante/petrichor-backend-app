@@ -24,7 +24,7 @@ export class GitHubApi implements LoadGithubApi {
     if (accessToken !== undefined) {
       const userData = await this.getUserData(accessToken)
       const email = await this.getEmailData(accessToken)
-      if (email !== undefined) {
+      if (userData !== undefined && email !== undefined) {
         return {
           ...userData,
           ...email
@@ -34,7 +34,7 @@ export class GitHubApi implements LoadGithubApi {
   }
 
   private async getAccessToken (code: string): Promise<string | undefined> {
-    const result: string = await this.httpClient.get({
+    const data = await this.httpClient.get({
       url: 'https://github.com/login/oauth/access_token',
       params: {
         client_id: this.clientId,
@@ -42,39 +42,40 @@ export class GitHubApi implements LoadGithubApi {
         code
       }
     })
-    const response = result.toString().split('=')
-    if (response[0] === 'access_token') {
-      return response[1].split('&')[0]
+    const params = new URLSearchParams(data)
+    const accessToken = params.get('access_token')
+    if (accessToken !== null) {
+      return accessToken
     }
   }
 
-  private async getUserData (accessToken: string): Promise<UserData> {
-    const { name, login, avatar_url, repos_url } = await this.httpClient.get({
+  private async getUserData (accessToken: string): Promise<UserData | undefined> {
+    return await this.httpClient.get({
       url: 'https://api.github.com/user',
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
-    })
-    return {
+    }).then(({ name, login, avatar_url, repos_url }) => ({
       name,
       userName: login,
       avatar: avatar_url,
       reposGithubUrl: repos_url
-    }
+    })).catch(() => undefined)
   }
 
   private async getEmailData (accessToken: string): Promise<EmailData | undefined> {
-    const emailData = await this.httpClient.get({
+    return await this.httpClient.get({
       url: 'https://api.github.com/user/emails',
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
-    })
-    if (Array.isArray(emailData)) {
-      const emailObj = emailData.filter(e => e.primary)
-      return {
-        email: emailObj[0].email
+    }).then(emailData => {
+      if (Array.isArray(emailData)) {
+        const emailObj = emailData.filter(e => e.primary)
+        return {
+          email: emailObj[0].email
+        }
       }
-    }
+    }).catch(() => undefined)
   }
 }
