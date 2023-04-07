@@ -1,6 +1,6 @@
-import { GitHubAuthentication } from '@/domain/usecases'
-import { HttpResponse, badRequest, serverError, unauthorized } from '@/application/helpers'
+import { HttpResponse, badRequest, ok, serverError, unauthorized } from '@/application/helpers'
 import { RequiredFieldError } from '@/application/errors'
+import { GitHubAuthentication } from '@/domain/usecases'
 import { AuthenticationError } from '@/domain/errors'
 
 export class GithubLoginController {
@@ -17,13 +17,10 @@ export class GithubLoginController {
       if (result instanceof AuthenticationError) {
         return unauthorized()
       } else {
-        return {
-          statusCode: 200,
-          data: {
-            user: result.user,
-            accessToken: result.accessToken.value
-          }
-        }
+        return ok({
+          user: result.user,
+          accessToken: result.accessToken.value
+        })
       }
     } catch (error) {
       const err = error as Error
