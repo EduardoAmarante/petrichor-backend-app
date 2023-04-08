@@ -7,16 +7,16 @@ import { Repository } from 'typeorm'
 describe('TypeormUserAccountRepository', () => {
   let email: string
   let sut: TypeormUserAccountRepository
-  let userAccountRepository: Repository<User>
+  let repository: Repository<User>
 
   beforeAll(() => {
     email = 'any_email'
-    userAccountRepository = db.getRepository(User)
   })
 
   beforeEach(async () => {
     await db.initialize()
-    sut = new TypeormUserAccountRepository(userAccountRepository)
+    repository = db.getRepository(User)
+    sut = new TypeormUserAccountRepository()
   })
 
   afterEach(async () => {
@@ -25,7 +25,7 @@ describe('TypeormUserAccountRepository', () => {
 
   describe('load', () => {
     it('should return an account if email exists', async () => {
-      await userAccountRepository.save({
+      await repository.save({
         name: 'any_name',
         user_name: 'any_user_name',
         email: 'any_email',
@@ -55,14 +55,14 @@ describe('TypeormUserAccountRepository', () => {
         reposGithubUrl: 'any_repos_github_url'
       })
 
-      const user = await userAccountRepository.findOne({ where: { email: 'any_email' } })
+      const user = await repository.findOne({ where: { email: 'any_email' } })
 
       expect(user?.id).toBe(1)
       expect(id).toBe('1')
     })
 
     it('should update account if id is defined', async () => {
-      await userAccountRepository.save({
+      await repository.save({
         name: 'any_name',
         user_name: 'any_name',
         email: 'any_email',
@@ -78,7 +78,7 @@ describe('TypeormUserAccountRepository', () => {
         avatar: 'new_avatar',
         reposGithubUrl: 'new_repos_github_url'
       })
-      const user = await userAccountRepository.findOne({ where: { id: 1 } })
+      const user = await repository.findOne({ where: { id: 1 } })
 
       expect(user).toEqual({
         id: 1,

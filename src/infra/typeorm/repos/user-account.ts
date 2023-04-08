@@ -1,15 +1,12 @@
 import { User } from '@/infra/typeorm/entities-db'
+import { db } from '@/infra/typeorm'
 import { LoadUserAccountRepository, SaveUserAccountRepository } from '@/data/contracts/repos'
 
-import { Repository } from 'typeorm'
-
 export class TypeormUserAccountRepository implements LoadUserAccountRepository, SaveUserAccountRepository {
-  constructor (
-    private readonly userAccountRepository: Repository<User>
-  ) {}
+  private readonly repository = db.getRepository(User)
 
   async load ({ email }: LoadUserAccountRepository.Input): Promise<LoadUserAccountRepository.Output> {
-    const account = await this.userAccountRepository.findOne({ where: { email } })
+    const account = await this.repository.findOne({ where: { email } })
     if (account !== null) {
       return {
         id: account.id.toString(),
@@ -24,7 +21,7 @@ export class TypeormUserAccountRepository implements LoadUserAccountRepository, 
 
   async saveWithGithub ({ id, name, userName, email, avatar, reposGithubUrl }: SaveUserAccountRepository.Input): Promise<SaveUserAccountRepository.Output> {
     if (id === undefined) {
-      const newUser = await this.userAccountRepository.save({
+      const newUser = await this.repository.save({
         name,
         user_name: userName,
         email,
@@ -40,7 +37,7 @@ export class TypeormUserAccountRepository implements LoadUserAccountRepository, 
         reposGithubUrl: newUser.repos_github_url
       }
     } else {
-      await this.userAccountRepository.update({
+      await this.repository.update({
         id: parseInt(id)
       }, {
         name,
