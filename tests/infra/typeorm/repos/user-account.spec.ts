@@ -26,6 +26,7 @@ describe('TypeormUserAccountRepository', () => {
   describe('load', () => {
     it('should return an account if email exists', async () => {
       await repository.save({
+        id: 'any_id',
         name: 'any_name',
         user_name: 'any_user_name',
         email: 'any_email',
@@ -35,7 +36,7 @@ describe('TypeormUserAccountRepository', () => {
 
       const account = await sut.load({ email })
 
-      expect(account).toMatchObject({ id: '1' })
+      expect(account).toMatchObject({ id: 'any_id' })
     })
 
     it('should return undefined if email does not exists', async () => {
@@ -46,23 +47,23 @@ describe('TypeormUserAccountRepository', () => {
   })
 
   describe('saveWithGithub', () => {
-    it('should create an account if id is undefined', async () => {
-      const { id } = await sut.saveWithGithub({
+    it('should create an account if not exists', async () => {
+      await sut.save({
+        id: 'any_id',
         name: 'any_name',
-        userName: 'any_name',
+        userName: 'any_user_name',
         email: 'any_email',
         avatar: 'any_avatar',
         reposGithubUrl: 'any_repos_github_url'
       })
+      const account = await repository.findOne({ where: { id: 'any_id' } })
 
-      const user = await repository.findOne({ where: { email: 'any_email' } })
-
-      expect(user?.id).toBe(1)
-      expect(id).toBe('1')
+      expect(account?.id).toBe('any_id')
     })
 
-    it('should update account if id is defined', async () => {
+    it('should update account already exists', async () => {
       await repository.save({
+        id: 'any_id',
         name: 'any_name',
         user_name: 'any_name',
         email: 'any_email',
@@ -70,26 +71,17 @@ describe('TypeormUserAccountRepository', () => {
         repos_github_url: 'any_repos_github_url'
       })
 
-      const { id, email } = await sut.saveWithGithub({
-        id: '1',
+      await sut.save({
+        id: 'any_id',
         name: 'new_name',
         userName: 'new_name',
         email: 'new_email',
         avatar: 'new_avatar',
         reposGithubUrl: 'new_repos_github_url'
       })
-      const user = await repository.findOne({ where: { id: 1 } })
+      const account = await repository.findOne({ where: { id: 'any_id' } })
 
-      expect(user).toEqual({
-        id: 1,
-        name: 'new_name',
-        user_name: 'new_name',
-        email: 'new_email',
-        avatar: 'new_avatar',
-        repos_github_url: 'new_repos_github_url'
-      })
-      expect(id).toBe('1')
-      expect(email).toBe('new_email')
+      expect(account?.id).toBe('any_id')
     })
   })
 })

@@ -1,6 +1,6 @@
-import { GitHubAccount } from '@/domain/models'
+import { UserAccount } from '@/domain/models'
 
-describe('GitHubAccount', () => {
+describe('UserAccount', () => {
   const gitHubData = {
     name: 'any_github_name',
     userName: 'any_github_user_name',
@@ -10,9 +10,10 @@ describe('GitHubAccount', () => {
   }
 
   it('should create with github data only', () => {
-    const sut = new GitHubAccount(gitHubData)
+    const sut = new UserAccount(gitHubData)
 
-    expect(sut).toEqual({
+    expect(sut.id).toBeDefined()
+    expect(sut).toMatchObject({
       name: 'any_github_name',
       userName: 'any_github_user_name',
       email: 'any_github_email',
@@ -22,8 +23,8 @@ describe('GitHubAccount', () => {
   })
 
   it('should update account with github data', () => {
-    const accountData = { id: 'any_id' }
-    const sut = new GitHubAccount(gitHubData, accountData)
+    const id = 'any_id'
+    const sut = new UserAccount(gitHubData, id)
 
     expect(sut).toEqual({
       id: 'any_id',

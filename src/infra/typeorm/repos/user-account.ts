@@ -1,15 +1,15 @@
-import { User } from '@/infra/typeorm/entities-db'
 import { db } from '@/infra/typeorm'
+import { User } from '@/infra/typeorm/entities-db'
 import { LoadUserAccountRepository, SaveUserAccountRepository } from '@/data/contracts/repos'
 
-export class TypeormUserAccountRepository implements LoadUserAccountRepository, SaveUserAccountRepository {
+export class TypeormUserAccountRepository implements LoadUserAccountRepository {
   private readonly repository = db.getRepository(User)
 
   async load ({ email }: LoadUserAccountRepository.Input): Promise<LoadUserAccountRepository.Output> {
     const account = await this.repository.findOne({ where: { email } })
     if (account !== null) {
       return {
-        id: account.id.toString(),
+        id: account.id,
         name: account.name,
         userName: account.user_name,
         email: account.email,
@@ -19,34 +19,25 @@ export class TypeormUserAccountRepository implements LoadUserAccountRepository, 
     }
   }
 
-  async saveWithGithub ({ id, name, userName, email, avatar, reposGithubUrl }: SaveUserAccountRepository.Input): Promise<SaveUserAccountRepository.Output> {
-    if (id === undefined) {
-      const newUser = await this.repository.save({
+  async save ({ id, name, userName, email, avatar, reposGithubUrl }: SaveUserAccountRepository.Input): Promise<void> {
+    const accountExists = await this.repository.findOne({ where: { id } })
+    if (accountExists === null) {
+      await this.repository.save({
+        id,
         name,
         user_name: userName,
         email,
         avatar,
         repos_github_url: reposGithubUrl
       })
-      return {
-        id: newUser.id.toString(),
-        name: newUser.name,
-        userName: newUser.user_name,
-        email: newUser.email,
-        avatar: newUser.avatar,
-        reposGithubUrl: newUser.repos_github_url
-      }
     } else {
-      await this.repository.update({
-        id: parseInt(id)
-      }, {
+      await this.repository.update({ id }, {
         name,
         user_name: userName,
         email,
         avatar,
         repos_github_url: reposGithubUrl
       })
-      return { id, name, userName, email, avatar, reposGithubUrl }
     }
   }
 }

@@ -1,42 +1,19 @@
+import { UserAccount } from '@/domain/models'
+
 export interface LoadUserAccountRepository {
   load: (input: LoadUserAccountRepository.Input) => Promise<LoadUserAccountRepository.Output>
 }
 
 export namespace LoadUserAccountRepository {
-  export type Input = {
-    email: string
-  }
+  export type Input = { email: string }
 
-  export type Output = undefined | {
-    id: string
-    name: string
-    userName: string
-    email: string
-    avatar: string
-    reposGithubUrl: string
-  }
+  export type Output = UserAccount | undefined
 }
 
 export interface SaveUserAccountRepository {
-  saveWithGithub: (input: SaveUserAccountRepository.Input) => Promise<SaveUserAccountRepository.Output>
+  save: (input: SaveUserAccountRepository.Input) => Promise<void>
 }
 
 export namespace SaveUserAccountRepository {
-  export type Input = {
-    id?: string
-    name: string
-    userName: string
-    email: string
-    avatar: string
-    reposGithubUrl: string
-  }
-
-  export type Output = {
-    id: string
-    name: string
-    userName: string
-    email: string
-    avatar: string
-    reposGithubUrl: string
-  }
+  export type Input = UserAccount
 }

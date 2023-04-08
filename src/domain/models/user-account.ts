@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto'
+
 type GitHubData = {
   name: string
   userName: string
@@ -6,20 +8,16 @@ type GitHubData = {
   reposGithubUrl: string
 }
 
-type AccountData = {
-  id?: string
-}
-
-export class GitHubAccount {
-  id?: string
+export class UserAccount {
+  id: string
   name: string
   userName: string
   email: string
   avatar: string
   reposGithubUrl: string
 
-  constructor (githubData: GitHubData, accountData?: AccountData) {
-    this.id = accountData?.id
+  constructor (githubData: GitHubData, id?: string) {
+    this.id = id ?? randomUUID()
     this.name = githubData.name
     this.userName = githubData.userName
     this.email = githubData.email

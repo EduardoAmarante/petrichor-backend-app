@@ -1,5 +1,5 @@
 import { AuthenticationError } from '@/domain/errors'
-import { AccessToken, GitHubAccount } from '@/domain/models'
+import { AccessToken, UserAccount } from '@/domain/models'
 import { GithubAuthenticationService } from '@/data/services'
 import { LoadGithubApi } from '@/data/contracts/apis'
 import { TokenGenerator } from '@/data/contracts/crypto'
@@ -7,7 +7,7 @@ import { SaveUserAccountRepository, LoadUserAccountRepository } from '@/data/con
 
 import { mock, MockProxy } from 'jest-mock-extended'
 
-jest.mock('@/domain/models/github-account')
+jest.mock('@/domain/models/user-account')
 
 describe('GithubAuthenticationService', () => {
   let code: string
@@ -28,14 +28,6 @@ describe('GithubAuthenticationService', () => {
     })
     userAccountRepository = mock()
     userAccountRepository.load.mockResolvedValue(undefined)
-    userAccountRepository.saveWithGithub.mockResolvedValue({
-      id: 'any_account_id',
-      name: 'any_name',
-      userName: 'any_user_name',
-      email: 'any_email',
-      avatar: 'any_avatar',
-      reposGithubUrl: 'any_repositories'
-    })
     crypto = mock()
     crypto.generateToken.mockResolvedValue('any_generated_token')
   })
@@ -70,17 +62,20 @@ describe('GithubAuthenticationService', () => {
     expect(userAccountRepository.load).toHaveBeenCalledTimes(1)
   })
 
-  it('should call SaveUserAccountRepository with GitHubAccount', async () => {
-    const GitHubAccountStub = jest.fn().mockImplementation(() => ({ any: 'any' }))
-    jest.mocked(GitHubAccount).mockImplementation(GitHubAccountStub)
+  it('should call SaveUserAccountRepository with UserAccount', async () => {
+    const UserAccountStub = jest.fn().mockImplementationOnce(() => ({ any: 'any' }))
+    jest.mocked(UserAccount).mockImplementationOnce(UserAccountStub)
 
     await sut.perform({ code })
 
-    expect(userAccountRepository.saveWithGithub).toHaveBeenCalledWith({ any: 'any' })
-    expect(userAccountRepository.saveWithGithub).toHaveBeenCalledTimes(1)
+    expect(userAccountRepository.save).toHaveBeenCalledWith({ any: 'any' })
+    expect(userAccountRepository.save).toHaveBeenCalledTimes(1)
   })
 
   it('should call TokenGenerator with correct input', async () => {
+    const UserAccountStub = jest.fn().mockImplementationOnce(() => ({ id: 'any_account_id' }))
+    jest.mocked(UserAccount).mockImplementationOnce(UserAccountStub)
+
     await sut.perform({ code })
 
     expect(crypto.generateToken).toHaveBeenCalledWith({
@@ -91,16 +86,26 @@ describe('GithubAuthenticationService', () => {
   })
 
   it('should return AuthData on success', async () => {
+    const UserAccountStub = jest.fn().mockImplementationOnce(() => ({
+      id: 'any_id',
+      name: 'any_name',
+      userName: 'any_user_name',
+      email: 'any_email',
+      avatar: 'any_avatar',
+      reposGithubUrl: 'any_github_repositories'
+    }))
+    jest.mocked(UserAccount).mockImplementationOnce(UserAccountStub)
+
     const authData = await sut.perform({ code })
 
     expect(authData).toEqual({
       user: {
-        id: 'any_account_id',
+        id: 'any_id',
         name: 'any_name',
         userName: 'any_user_name',
         email: 'any_email',
         avatar: 'any_avatar',
-        reposGithubUrl: 'any_repositories'
+        reposGithubUrl: 'any_github_repositories'
       },
       accessToken: new AccessToken('any_generated_token')
     })
@@ -123,7 +128,7 @@ describe('GithubAuthenticationService', () => {
   })
 
   it('should rethrows if SaveUserAccountRepository thorws', async () => {
-    userAccountRepository.saveWithGithub.mockRejectedValueOnce(new Error('save_error'))
+    userAccountRepository.save.mockRejectedValueOnce(new Error('save_error'))
 
     const promise = sut.perform({ code })
 

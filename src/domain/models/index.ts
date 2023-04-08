@@ -1,2 +1,2 @@
-export * from './github-account'
+export * from './user-account'
 export * from './access-token'
