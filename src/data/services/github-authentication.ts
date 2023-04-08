@@ -16,8 +16,8 @@ export class GithubAuthenticationService implements GitHubAuthentication {
     const githubData = await this.githubApi.loadUser({ code })
     if (githubData !== undefined) {
       const accountData = await this.userAccountRepository.load({ email: githubData.email })
-      const gitHubData = new GitHubAccount(githubData, accountData)
-      const user = await this.userAccountRepository.saveWithGithub(gitHubData)
+      const gitHubAccount = new GitHubAccount(githubData, accountData)
+      const user = await this.userAccountRepository.saveWithGithub(gitHubAccount)
       const token = await this.crypto.generateToken({ key: user.id, expirationInMs: AccessToken.expirationInMs })
       return {
         user,
