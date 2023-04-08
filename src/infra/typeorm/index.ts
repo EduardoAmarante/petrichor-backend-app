@@ -22,4 +22,4 @@ const dbTest = new DataSource({
   migrations: [join(`${__dirname}/**/migrations/*.{ts,js}`)]
 })
 
-export const db = process.env.DB === 'prod' ? dbProd : dbTest
+export const db = process.env.NODE_ENV !== 'test' ? dbProd : dbTest
