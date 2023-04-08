@@ -1,5 +1,3 @@
-import 'dotenv/config'
-import 'reflect-metadata'
 import { join } from 'path'
 import { DataSource } from 'typeorm'
 
