@@ -13,7 +13,7 @@
     "prepare": "husky install",
     "migration:generate": "typeorm-ts-node-commonjs -d ./src/infra/typeorm/index.ts migration:generate ./src/infra/typeorm/migrations/default",
     "migration:run": "typeorm-ts-node-commonjs -d ./src/infra/typeorm/index.ts migration:run",
-    "test": "set NODE_ENV=test && jest --passWithNoTests --no-cache --runInBand",
+    "test": "jest --passWithNoTests --no-cache --runInBand",
     "test:watch": "npm t -- --watch",
     "test:staged": "npm t -- --findRelatedTests",
     "test:coverage": "npm t -- --coverage",
